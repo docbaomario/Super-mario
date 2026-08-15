@@ -25,25 +25,33 @@
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            max-width: 400px;
+            max-width: 350px;
             width: 90%;
         }
-        h2 { color: #333; margin-bottom: 15px; font-size: 20px; }
-        p { color: #666; margin-bottom: 25px; font-size: 14px; }
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
         button {
             background-color: #28a745;
             color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
+            padding: 12px 25px;
+            font-size: 16px;
             font-weight: bold;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
-            width: 100%;
+            transition: 0.2s;
         }
-
-        /* KHUNG JUMPSCARE SIÊU KINH ĐỊ */
-        #jumpscare {
+        button:hover {
+            background-color: #218838;
+        }
+        #scaryOverlay {
             display: none;
             position: fixed;
             top: 0;
@@ -51,98 +59,55 @@
             width: 100vw;
             height: 100vh;
             background-color: black;
-            z-index: 999999;
-            animation: flashBg 0.05s infinite alternate;
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
         }
-
-        #jumpscare img {
+        #scaryImg {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            animation: extremeScare 0.04s infinite alternate;
-        }
-
-        /* Hiệu ứng nháy nền đỏ - đen dồn dập */
-        @keyframes flashBg {
-            0% { background-color: #ff0000; }
-            50% { background-color: #000000; }
-            100% { background-color: #ffffff; }
-        }
-
-        /* Hiệu ứng biến dạng ảnh cực mạnh */
-        @keyframes extremeScare {
-            0% {
-                transform: scale(1) translate(0, 0) rotate(0deg);
-                filter: brightness(2) contrast(3) invert(0);
-            }
-            33% {
-                transform: scale(1.3) translate(-20px, 15px) rotate(-3deg);
-                filter: brightness(0.2) contrast(4) invert(1);
-            }
-            66% {
-                transform: scale(1.1) translate(20px, -15px) rotate(3deg);
-                filter: brightness(2.5) contrast(2) hue-rotate(180deg);
-            }
-            100% {
-                transform: scale(1.4) translate(-10px, -20px) rotate(0deg);
-                filter: brightness(0.5) contrast(5) invert(0);
-            }
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
+    <div class="card" id="mainCard">
         <h2>🎁 Phần Quà May Mắn</h2>
-        <p>Bấm vào nút bên dưới để mở hộp quà dành riêng cho bạn!</p>
-        <button onclick="startUltraScare()">MỞ QUÀ NGAY</button>
+        <p>Bạn đã nhận được một phần quà ngẫu nhiên từ hệ thống. Bấm vào nút bên dưới để mở quà nhé!</p>
+        <button onclick="startTroll()">MỞ QUÀ NGAY</button>
     </div>
 
-    <!-- Màn hình Jumpscare -->
-    <div id="jumpscare">
-        <img id="scaryImg" src="1000002375.jpg" alt="BOO!">
+    <div id="scaryOverlay">
+        <img id="scaryImg" src="anh-ma-kinh-di.jpg" alt="BOO!">
     </div>
 
-    <!-- Hệ thống đa âm thanh -->
-    <audio id="screamSound" src="https://www.myinstants.com/media/sounds/screaming-ghost.mp3" preload="auto" loop></audio>
-    <audio id="laughSound" src="https://www.myinstants.com/media/sounds/witch-laugh.mp3" preload="auto" loop></audio>
+    <!-- Âm thanh tiếng hét kinh dị online -->
+    <audio id="screamSound" src="https://www.soundjay.com/human/sounds/screaming-woman-1.mp3" preload="auto"></audio>
 
     <script>
-        function startUltraScare() {
-            // 1. Ép toàn màn hình
+        function startTroll() {
+            // Mở toàn màn hình
             let elem = document.documentElement;
             if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(err => {});
+                elem.requestFullscreen().catch(() => {});
             } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen();
+                elem.webkitRequestFullscreen().catch(() => {});
             }
 
-            // 2. Hiện khung hoảng sợ
-            document.getElementById('jumpscare').style.display = 'block';
+            // Phát âm thanh tiếng hét ở mức âm lượng tối đa
+            let audio = document.getElementById('screamSound');
+            audio.volume = 1.0;
+            audio.play().catch(e => console.log(e));
 
-            // 3. Phát đồng thời nhiều âm thanh volume max
-            let sound1 = document.getElementById('screamSound');
-            let sound2 = document.getElementById('laughSound');
-            sound1.volume = 1.0;
-            sound2.volume = 1.0;
-            sound1.play();
-            sound2.play();
+            // Hiển thị ảnh ma kín màn hình
+            document.getElementById('scaryOverlay').style.display = 'flex';
+            document.getElementById('mainCard').style.display = 'none';
 
-            // 4. Kích hoạt rung điện thoại (nếu chạy trên Android/Web Mobile)
+            // Rung máy điện thoại (nếu thiết bị hỗ trợ)
             if ("vibrate" in navigator) {
-                // Rung theo nhịp dồn dập
-                navigator.vibrate([100, 30, 100, 30, 300, 50, 100, 30, 500]);
-                // Lặp lại rung liên tục
-                setInterval(() => {
-                    navigator.vibrate([100, 30, 100, 30, 300, 50, 100, 30, 500]);
-                }, 1200);
+                navigator.vibrate([500, 100, 500, 100, 500, 100, 1000]);
             }
-
-            // 5. Chặn nạn nhân nhấn nút "Back" trên điện thoại để thoát
-            history.pushState(null, null, location.href);
-            window.onpopstate = function () {
-                history.pushState(null, null, location.href);
-            };
         }
     </script>
 </body>
