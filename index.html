@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Xác nhận thông tin nhận quà</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f6f9;
@@ -28,15 +24,8 @@
             max-width: 350px;
             width: 90%;
         }
-        h2 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        p {
-            color: #666;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
+        h2 { color: #333; margin-bottom: 10px; }
+        p { color: #666; margin-bottom: 20px; font-size: 14px; }
         button {
             background-color: #28a745;
             color: white;
@@ -46,28 +35,18 @@
             font-weight: bold;
             border-radius: 6px;
             cursor: pointer;
-            transition: 0.2s;
-        }
-        button:hover {
-            background-color: #218838;
         }
         #scaryOverlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             background-color: black;
             z-index: 9999;
             justify-content: center;
             align-items: center;
         }
-        #scaryImg {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        #scaryImg { width: 100%; height: 100%; object-fit: cover; }
     </style>
 </head>
 <body>
@@ -75,40 +54,56 @@
     <div class="card" id="mainCard">
         <h2>🎁 Phần Quà May Mắn</h2>
         <p>Bạn đã nhận được một phần quà ngẫu nhiên từ hệ thống. Bấm vào nút bên dưới để mở quà nhé!</p>
-        <button onclick="startTroll()">MỞ QUÀ NGAY</button>
+        <button id="btnOpen">MỞ QUÀ NGAY</button>
     </div>
 
     <div id="scaryOverlay">
         <img id="scaryImg" src="anh-ma-kinh-di.jpg" alt="BOO!">
     </div>
 
-    <!-- Âm thanh tiếng hét kinh dị online -->
-    <audio id="screamSound" src="https://www.soundjay.com/human/sounds/screaming-woman-1.mp3" preload="auto"></audio>
+    <!-- Âm thanh dự phòng -->
+    <audio id="screamSound" src="https://assets.mixkit.co/active_storage/sfx/2170/2170-preview.mp3" preload="auto"></audio>
 
     <script>
-        function startTroll() {
-            // Mở toàn màn hình
+        document.getElementById('btnOpen').addEventListener('click', function() {
+            // 1. Phóng to toàn màn hình
             let elem = document.documentElement;
-            if (elem.requestFullscreen) {
-                elem.requestFullscreen().catch(() => {});
-            } else if (elem.webkitRequestFullscreen) {
-                elem.webkitRequestFullscreen().catch(() => {});
-            }
+            if (elem.requestFullscreen) { elem.requestFullscreen().catch(()=>{}); }
+            else if (elem.webkitRequestFullscreen) { elem.webkitRequestFullscreen().catch(()=>{}); }
 
-            // Phát âm thanh tiếng hét ở mức âm lượng tối đa
+            // 2. Tạo âm thanh tiếng rú/rít bằng Web Audio API (Trình duyệt BẮT BUỘC phát)
+            try {
+                let ctx = new (window.AudioContext || window.webkitAudioContext)();
+                let osc = ctx.createOscillator();
+                let gain = ctx.createGain();
+                
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(3000, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(300, ctx.currentTime + 1.5);
+                
+                gain.gain.setValueAtTime(1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.start();
+                osc.stop(ctx.currentTime + 1.5);
+            } catch(e) {}
+
+            // 3. Phát song song file âm thanh tiếng hét MP3
             let audio = document.getElementById('screamSound');
             audio.volume = 1.0;
             audio.play().catch(e => console.log(e));
 
-            // Hiển thị ảnh ma kín màn hình
+            // 4. Bật ảnh ma & rung máy
             document.getElementById('scaryOverlay').style.display = 'flex';
             document.getElementById('mainCard').style.display = 'none';
 
-            // Rung máy điện thoại (nếu thiết bị hỗ trợ)
             if ("vibrate" in navigator) {
-                navigator.vibrate([500, 100, 500, 100, 500, 100, 1000]);
+                navigator.vibrate([400, 100, 400, 100, 400, 100, 800]);
             }
-        }
+        });
     </script>
 </body>
 </html>
