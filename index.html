@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác nhận thông tin nhận quà</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 90%;
+        }
+        h2 { color: #333; margin-bottom: 15px; font-size: 20px; }
+        p { color: #666; margin-bottom: 25px; font-size: 14px; }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* KHUNG JUMPSCARE SIÊU KINH ĐỊ */
+        #jumpscare {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: black;
+            z-index: 999999;
+            animation: flashBg 0.05s infinite alternate;
+        }
+
+        #jumpscare img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            animation: extremeScare 0.04s infinite alternate;
+        }
+
+        /* Hiệu ứng nháy nền đỏ - đen dồn dập */
+        @keyframes flashBg {
+            0% { background-color: #ff0000; }
+            50% { background-color: #000000; }
+            100% { background-color: #ffffff; }
+        }
+
+        /* Hiệu ứng biến dạng ảnh cực mạnh */
+        @keyframes extremeScare {
+            0% {
+                transform: scale(1) translate(0, 0) rotate(0deg);
+                filter: brightness(2) contrast(3) invert(0);
+            }
+            33% {
+                transform: scale(1.3) translate(-20px, 15px) rotate(-3deg);
+                filter: brightness(0.2) contrast(4) invert(1);
+            }
+            66% {
+                transform: scale(1.1) translate(20px, -15px) rotate(3deg);
+                filter: brightness(2.5) contrast(2) hue-rotate(180deg);
+            }
+            100% {
+                transform: scale(1.4) translate(-10px, -20px) rotate(0deg);
+                filter: brightness(0.5) contrast(5) invert(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>🎁 Phần Quà May Mắn</h2>
+        <p>Bấm vào nút bên dưới để mở hộp quà dành riêng cho bạn!</p>
+        <button onclick="startUltraScare()">MỞ QUÀ NGAY</button>
+    </div>
+
+    <!-- Màn hình Jumpscare -->
+    <div id="jumpscare">
+        <img id="scaryImg" src="1000002375.jpg" alt="BOO!">
+    </div>
+
+    <!-- Hệ thống đa âm thanh -->
+    <audio id="screamSound" src="https://www.myinstants.com/media/sounds/screaming-ghost.mp3" preload="auto" loop></audio>
+    <audio id="laughSound" src="https://www.myinstants.com/media/sounds/witch-laugh.mp3" preload="auto" loop></audio>
+
+    <script>
+        function startUltraScare() {
+            // 1. Ép toàn màn hình
+            let elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => {});
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            }
+
+            // 2. Hiện khung hoảng sợ
+            document.getElementById('jumpscare').style.display = 'block';
+
+            // 3. Phát đồng thời nhiều âm thanh volume max
+            let sound1 = document.getElementById('screamSound');
+            let sound2 = document.getElementById('laughSound');
+            sound1.volume = 1.0;
+            sound2.volume = 1.0;
+            sound1.play();
+            sound2.play();
+
+            // 4. Kích hoạt rung điện thoại (nếu chạy trên Android/Web Mobile)
+            if ("vibrate" in navigator) {
+                // Rung theo nhịp dồn dập
+                navigator.vibrate([100, 30, 100, 30, 300, 50, 100, 30, 500]);
+                // Lặp lại rung liên tục
+                setInterval(() => {
+                    navigator.vibrate([100, 30, 100, 30, 300, 50, 100, 30, 500]);
+                }, 1200);
+            }
+
+            // 5. Chặn nạn nhân nhấn nút "Back" trên điện thoại để thoát
+            history.pushState(null, null, location.href);
+            window.onpopstate = function () {
+                history.pushState(null, null, location.href);
+            };
+        }
+    </script>
+</body>
+</html>
